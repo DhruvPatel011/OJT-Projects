@@ -352,8 +352,15 @@ function getFilteredTasks() {
   return tasks;
 }
 
+/* =====================================================
+   PRIORITY GROUPS — render tasks in High → Medium → Low
+   ===================================================== */
+const PRIORITY_ORDER = ['high', 'medium', 'low'];
+const PRIORITY_LABELS = { high: '🔴 High Priority', medium: '🟡 Medium Priority', low: '🟢 Low Priority' };
+const PRIORITY_ICONS  = { high: 'fa-fire', medium: 'fa-circle-half-stroke', low: 'fa-leaf' };
+
 function renderTasksView() {
-  // Header
+  // Header title
   const catName = state.activeCategory === 'all'
     ? 'All Tasks'
     : (state.categories.find(c => c.id === state.activeCategory)?.name || 'Tasks');
@@ -363,8 +370,8 @@ function renderTasksView() {
   document.getElementById('currentCategoryCount').textContent =
     `${filtered.length} task${filtered.length !== 1 ? 's' : ''}`;
 
-  const listEl   = document.getElementById('taskList');
-  const emptyEl  = document.getElementById('emptyState');
+  const listEl  = document.getElementById('taskList');
+  const emptyEl = document.getElementById('emptyState');
   listEl.innerHTML = '';
 
   if (filtered.length === 0) {
@@ -373,19 +380,52 @@ function renderTasksView() {
   }
   emptyEl.style.display = 'none';
 
-  // Sort: incomplete first, then by due date
-  filtered.sort((a, b) => {
-    if (a.completed !== b.completed) return a.completed ? 1 : -1;
-    if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
-    if (a.dueDate) return -1;
-    if (b.dueDate) return 1;
-    return 0;
+  // Separate pending vs completed
+  const pending   = filtered.filter(t => !t.completed);
+  const completed = filtered.filter(t => t.completed);
+
+  // Helper: sort within a group by due date
+  function sortByDue(arr) {
+    return arr.slice().sort((a, b) => {
+      if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return 0;
+    });
+  }
+
+  // Render pending tasks grouped by priority
+  PRIORITY_ORDER.forEach(p => {
+    const group = sortByDue(pending.filter(t => t.priority === p));
+    if (group.length === 0) return;
+
+    // Section header
+    const header = document.createElement('div');
+    header.className = `priority-group-header priority-group-${p}`;
+    header.innerHTML = `
+      <span class="pg-dot"></span>
+      <i class="fa ${PRIORITY_ICONS[p]}"></i>
+      <span>${PRIORITY_LABELS[p]}</span>
+      <span class="pg-count">${group.length}</span>
+    `;
+    listEl.appendChild(header);
+
+    group.forEach(task => listEl.appendChild(createTaskElement(task)));
   });
 
-  filtered.forEach(task => {
-    const el = createTaskElement(task);
-    listEl.appendChild(el);
-  });
+  // Render completed tasks as a separate collapsed-style group
+  if (completed.length > 0) {
+    const compHeader = document.createElement('div');
+    compHeader.className = 'priority-group-header priority-group-done';
+    compHeader.innerHTML = `
+      <span class="pg-dot"></span>
+      <i class="fa fa-check-circle"></i>
+      <span>Completed</span>
+      <span class="pg-count">${completed.length}</span>
+    `;
+    listEl.appendChild(compHeader);
+    sortByDue(completed).forEach(task => listEl.appendChild(createTaskElement(task)));
+  }
 }
 
 function createTaskElement(task) {
@@ -591,8 +631,12 @@ backdrop.className = 'sidebar-backdrop';
 document.body.appendChild(backdrop);
 
 document.getElementById('hamburger').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.add('open');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.add('open');
   backdrop.classList.add('open');
+  // Reposition close button to be just inside the sidebar edge
+  const w = sidebar.offsetWidth;
+  document.getElementById('sidebarClose').style.left = (w - 46) + 'px';
 });
 
 function closeMobileSidebar() {

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
 /* =========================================================
    ZENITH TASK MANAGER — style.css
    Aesthetic: Refined dark-accented editorial with warm ivory
@@ -71,7 +69,7 @@ body {
   position: fixed;
   top: 0; left: 0; bottom: 0;
   overflow-y: auto;
-  z-index: 100;
+  z-index: 200;
   transition: transform var(--transition);
 }
 
@@ -87,18 +85,26 @@ body {
 
 .sidebar-close {
   display: none;
-  position: absolute;
-  top: 16px; right: 16px;
-  background: rgba(255,255,255,.1);
-  border: none;
-  color: var(--text-on-dark);
+  position: fixed;
+  top: 14px;
+  left: calc(var(--sidebar-w) - 46px);
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.2);
+  color: #fff;
   width: 34px; height: 34px;
   border-radius: 50%;
   font-size: .9rem;
   cursor: pointer;
-  transition: background var(--transition);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), transform var(--transition);
+  box-shadow: 0 2px 12px rgba(0,0,0,.3);
 }
-.sidebar-close:hover { background: rgba(255,255,255,.2); }
+.sidebar-close:hover {
+  background: rgba(239,68,68,.5);
+  transform: scale(1.1);
+}
 
 /* Profile Card */
 .profile-card {
@@ -905,45 +911,247 @@ body {
   opacity: 1;
 }
 
-/* ── RESPONSIVE ───────────────────────────────────────── */
-@media (max-width: 900px) {
-  :root { --sidebar-w: 280px; }
+/* ── PRIORITY GROUP HEADERS ──────────────────────────── */
+.priority-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 4px 6px;
+  margin-top: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(22,19,31,.07);
+}
+.priority-group-header:first-child { margin-top: 0; }
+
+.pg-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.priority-group-high   { color: #dc2626; }
+.priority-group-high   .pg-dot { background: var(--high); box-shadow: 0 0 6px rgba(239,68,68,.5); }
+.priority-group-medium { color: #d97706; }
+.priority-group-medium .pg-dot { background: var(--medium); box-shadow: 0 0 6px rgba(245,158,11,.4); }
+.priority-group-low    { color: #16a34a; }
+.priority-group-low    .pg-dot { background: var(--low); box-shadow: 0 0 6px rgba(34,197,94,.4); }
+.priority-group-done   { color: var(--text-muted); }
+.priority-group-done   .pg-dot { background: var(--text-muted); }
+
+.pg-count {
+  margin-left: auto;
+  background: rgba(22,19,31,.07);
+  border-radius: 99px;
+  padding: 1px 9px;
+  font-size: .72rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  color: inherit;
 }
 
-@media (max-width: 720px) {
+/* Show close button whenever sidebar is a drawer */
+@media (max-width: 1023px) {
+  .sidebar-close { display: flex; }
+}
+
+
+/* ── Large Desktop (1400px+) ── */
+@media (min-width: 1400px) {
+  :root { --sidebar-w: 320px; }
+  html { font-size: 16px; }
+  .topbar { padding: 18px 40px; }
+  .filter-bar, .task-list { padding-left: 40px; padding-right: 40px; }
+  .add-task-card { margin-left: 40px; margin-right: 40px; }
+  .search-input { width: 260px; }
+  .search-input:focus { width: 320px; }
+}
+
+/* ── Desktop (1024px – 1399px) ── */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  :root { --sidebar-w: 290px; }
+}
+
+/* ── Tablet Landscape (768px – 1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --sidebar-w: 260px; }
+  html { font-size: 14px; }
+  .sidebar { padding: 22px 16px 32px; gap: 20px; }
+  .avatar-initials, .avatar-img { width: 66px; height: 66px; font-size: 1.4rem; }
+  .topbar { padding: 14px 22px; }
+  .filter-bar, .task-list { padding-left: 22px; padding-right: 22px; }
+  .add-task-card { margin-left: 22px; margin-right: 22px; }
+  .search-input { width: 180px; }
+  .search-input:focus { width: 220px; }
+  .stat-num { font-size: 1.2rem; }
+}
+
+/* ── Tablet Portrait (600px – 767px) ── */
+@media (min-width: 600px) and (max-width: 767px) {
+  html { font-size: 14px; }
   .sidebar {
+    width: 280px;
     transform: translateX(-100%);
     box-shadow: none;
+    z-index: 200;
+  }
+
+  .filter-bar, .task-list { padding-left: 20px; padding-right: 20px; }
+  .add-task-card { margin-left: 20px; margin-right: 20px; }
+  .search-input { width: 170px; }
+  .search-input:focus { width: 200px; }
+  .form-row { flex-direction: row; }
+  .task-actions { opacity: 1; }
+}
+
+/* ── Mobile Large (480px – 599px) ── */
+@media (min-width: 480px) and (max-width: 599px) {
+  html { font-size: 13.5px; }
+  .sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: none;
+    z-index: 200;
   }
   .sidebar.open {
     transform: translateX(0);
-    box-shadow: 4px 0 40px rgba(16,13,31,.25);
+    box-shadow: 6px 0 50px rgba(16,13,31,.3);
   }
-  .sidebar-close { display: flex; }
   .main-content { margin-left: 0; }
   .hamburger { display: block; }
-  .topbar { padding: 14px 16px; gap: 10px; }
-  .search-input { width: 160px; }
-  .search-input:focus { width: 180px; }
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .topbar-title h1 { font-size: 1.2rem; }
   .filter-bar, .task-list { padding-left: 16px; padding-right: 16px; }
   .add-task-card { margin-left: 16px; margin-right: 16px; }
+  .search-input { width: 150px; }
+  .search-input:focus { width: 180px; }
   .form-row { flex-direction: column; }
-}
-
-@media (max-width: 480px) {
-  .topbar-title h1 { font-size: 1.1rem; }
   .task-actions { opacity: 1; }
   .cat-actions { opacity: 1; }
-  .search-wrap { display: none; }
 }
 
-/* ── MOBILE OVERLAY backdrop ──────────────────────────── */
+/* ── Mobile (up to 479px) ── */
+@media (max-width: 479px) {
+  html { font-size: 13px; }
+  .sidebar {
+    width: 100%;
+    max-width: 300px;
+    transform: translateX(-100%);
+    box-shadow: none;
+    z-index: 200;
+    padding: 20px 16px 28px;
+    gap: 18px;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 6px 0 50px rgba(16,13,31,.35);
+  }
+  .main-content { margin-left: 0; }
+  .hamburger { display: block; }
+
+  /* Topbar */
+  .topbar { padding: 12px 14px; gap: 8px; }
+  .topbar-title h1 { font-size: 1.05rem; }
+  .task-badge { display: none; }
+
+  /* Search inline below topbar on tiny screens */
+  .topbar { flex-wrap: wrap; }
+  .topbar-actions { width: 100%; }
+  .search-input { width: 100%; border-radius: var(--radius-sm); }
+  .search-input:focus { width: 100%; }
+
+  /* Filter bar */
+  .filter-bar {
+    padding: 10px 14px 4px;
+    gap: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-btn { white-space: nowrap; flex-shrink: 0; padding: 5px 14px; font-size: .78rem; }
+
+  /* Add task card */
+  .add-task-card { margin: 10px 14px; }
+  .add-task-header { padding: 14px 16px; font-size: .88rem; }
+  .add-task-body { padding: 0 14px 16px; gap: 12px; }
+
+  /* Form */
+  .form-row { flex-direction: column; gap: 10px; }
+  .form-group label { font-size: .72rem; }
+  .form-group input, .form-group select { padding: 8px 12px; font-size: .85rem; }
+  .form-actions { flex-direction: column-reverse; gap: 8px; }
+  .btn-add-task, .btn-cancel { width: 100%; justify-content: center; }
+
+  /* Task list */
+  .task-list { padding: 6px 14px; gap: 8px; }
+  .task-item { padding: 12px 14px; gap: 10px; }
+  .task-title { font-size: .88rem; }
+  .task-desc  { font-size: .78rem; }
+  .task-actions { opacity: 1; }
+  .cat-actions  { opacity: 1; }
+
+  /* Stats */
+  .stat-num { font-size: 1.1rem; }
+  .stat-label { font-size: .65rem; }
+
+  /* Profile */
+  .avatar-initials, .avatar-img { width: 60px; height: 60px; font-size: 1.3rem; }
+  .profile-name { font-size: .95rem; }
+
+  /* Empty state */
+  .empty-state { padding: 50px 14px; }
+  .empty-icon { width: 64px; height: 64px; font-size: 1.6rem; }
+
+  /* Priority groups */
+  .priority-group-header { font-size: .72rem; padding: 8px 2px 5px; }
+}
+
+/* ── Extra Small (360px and below) ── */
+@media (max-width: 360px) {
+  html { font-size: 12.5px; }
+  .topbar { padding: 10px 12px; }
+  .task-list { padding-left: 12px; padding-right: 12px; }
+  .add-task-card { margin-left: 12px; margin-right: 12px; }
+  .filter-bar { padding-left: 12px; }
+  .task-item { padding: 10px 12px; }
+  .sidebar { max-width: 280px; padding: 16px 14px 24px; }
+}
+
+/* ── MOBILE SIDEBAR BACKDROP ─────────────────────────── */
 .sidebar-backdrop {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(16,13,31,.4);
-  z-index: 99;
+  background: rgba(16,13,31,.45);
+  backdrop-filter: blur(2px);
+  z-index: 199;
   cursor: pointer;
+  animation: fadeIn .2s ease;
 }
 .sidebar-backdrop.open { display: block; }
+
+/* ── TOUCH DEVICE IMPROVEMENTS ───────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  .task-actions { opacity: 1; }
+  .cat-actions  { opacity: 1; }
+  .task-btn { width: 36px; height: 36px; font-size: .85rem; }
+  .cat-btn  { width: 28px; height: 28px; font-size: .75rem; }
+  .filter-btn { padding: 7px 16px; }
+  .btn-add-task, .btn-save, .btn-danger, .btn-cancel { min-height: 42px; }
+  .task-check { width: 26px; height: 26px; }
+  .category-item { padding: 12px 14px; }
+}
+
+/* ── PRINT ───────────────────────────────────────────── */
+@media print {
+  .sidebar, .topbar-actions, .filter-bar, .add-task-card,
+  .task-actions, .cat-actions, .toast, .modal-overlay { display: none !important; }
+  .main-content { margin-left: 0; }
+  .task-item { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  body { background: white; }
+}
